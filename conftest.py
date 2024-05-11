@@ -9,11 +9,21 @@ from endpoints.ingredients_endpoints import GetIngredients
 
 # фикстура сделана с отдачей токена через авторизацию (user flow), т.к. это логичнее чем токен тольеко через регистрацию
 @pytest.fixture
-def authorization_user():
-    CreateNewUser().create_new_user(email=DataUser.EMAIL, password=DataUser.PASSWORD, name=DataUser.NAME)
-    response = LoginUser().login_user(email=DataUser.EMAIL, password=DataUser.PASSWORD)
-    yield response.json()['accessToken']
+def create_new_user():
+    email = DataUser.EMAIL
+    password = DataUser.PASSWORD
+    response = CreateNewUser().create_new_user(email=email, password=password, name=DataUser.NAME)
+    yield email, password
     DeleteUser().delete_user(token=response.json()['accessToken'])
+
+
+@pytest.fixture
+def authorization_user(create_new_user):
+    email, password = create_new_user
+    response = LoginUser().login_user(email=email, password=password)
+    token = response.json()['accessToken']
+    yield token
+    DeleteUser().delete_user(token=token)
 
 
 @pytest.fixture

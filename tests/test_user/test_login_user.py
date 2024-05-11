@@ -8,10 +8,8 @@ class TestLoginUser:
 
     @allure.title('Логин пользователя')
     @allure.description('Логин под существующим пользователем')
-    def test_login_user(self):
-        email = DataUser.EMAIL
-        password = DataUser.PASSWORD
-        CreateNewUser().create_new_user(email=email, password=password, name=DataUser.NAME)
+    def test_login_user(self, create_new_user):
+        email, password = create_new_user
         response = LoginUser().login_user(email=email, password=password)
         assert response.status_code == 200, \
             f'Код ответа {response.status_code} и тело ответа {response.text}'
